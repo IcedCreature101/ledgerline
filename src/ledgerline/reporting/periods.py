@@ -43,7 +43,9 @@ def month_period(year: int, month: int) -> Period:
     if not 1 <= month <= 12:
         raise PeriodError(f"month must be 1-12, got {month}")
     start = date(year, month, 1)
-    end = start + timedelta(days=30)
+    # Determine the actual last day of the month (handles leap years, etc.)
+    last_day = calendar.monthrange(year, month)[1]
+    end = date(year, month, last_day)
     return Period(start, end)
 
 
