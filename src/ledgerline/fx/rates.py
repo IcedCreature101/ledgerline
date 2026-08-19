@@ -14,8 +14,8 @@ from ledgerline.core.money import Money
 
 
 class RateUnavailable(LookupError):
-    """No rate for this pair on this date. The caller must decide what to do — hold the payment, use a
-    different corridor, or fail the request. It is not something this module can paper over."""
+    """No rate for this pair on this date. The caller must decide what to do — hold the payment,
+    use a different corridor, or fail the request. It is not something this module can paper over."""
 
 
 @dataclass
@@ -37,7 +37,7 @@ class RateTable:
             inverse = self.rates.get((quote, base))
             if inverse is not None and inverse != 0:
                 return Decimal("1") / inverse
-            return Decimal("1")
+            raise RateUnavailable(f"no rate for {base}/{quote} on {self.as_of}")
 
     def has(self, base: str, quote: str) -> bool:
         base, quote = base.upper(), quote.upper()
