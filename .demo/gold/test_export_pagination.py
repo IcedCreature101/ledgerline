@@ -17,9 +17,15 @@ def repo():
 
 
 def _add(repo, count, settled_every=1):
+    """Add `count` transactions, every `settled_every`-th one settled. `settled_every=0` settles none.
+
+    `i % settled_every == 0` is true for i=0 whatever the modulus, so "settle every 999th of 5" still
+    settled the first one — and the test that asserted an empty export was asserting against a row that
+    was genuinely there. The oracle was wrong, not the export.
+    """
     settled = []
     for i in range(count):
-        status = "settled" if (i % settled_every == 0) else "authorized"
+        status = "settled" if (settled_every and i % settled_every == 0) else "authorized"
         if status == "settled":
             settled.append(f"txn_{i:03d}")
         repo.add(Transaction(f"txn_{i:03d}", "m_1", Money(1000 + i, "USD"), status,
@@ -50,5 +56,5 @@ def test_an_all_settled_export_is_unchanged(repo):
 
 
 def test_a_merchant_with_nothing_settled_exports_nothing(repo):
-    _add(repo, 5, settled_every=999)
+    assert _add(repo, 5, settled_every=0) == []          # nothing settled at all
     assert repo.export_settled("m_1") == []
