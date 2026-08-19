@@ -74,9 +74,32 @@ def calculate_fee(amount: Money, schedule: FeeSchedule | str = STANDARD) -> Mone
     if amount.is_zero():
         return Money.zero(amount.currency)
 
-    rate = sched.rate_for(amount)
-    variable = amount.apply_rate(rate)
-    return Money(variable.minor + sched.fixed_minor, amount.currency)
+    # Compute the variable fee by iterating over the tiers and applying each rate to the
+    # portion of the amount that falls within that tier.
+    remaining_minor = amount.minor
+    previous_upto = 0
+    variable_fee = Money.zero(amount.currency)
+
+    for tier in sched.tiers:
+        # Determine the slice size for this tier.
+        if tier.upto_minor is None:
+            slice_minor = remaining_minor
+        else:
+            slice_limit = tier.upto_minor - previous_upto
+            slice_minor = min(remaining_minor, slice_limit)
+
+        if slice_minor > 0:
+            slice_money = Money(slice_minor, amount.currency)
+            variable_fee = variable_fee + slice_money.apply_rate(tier.rate)
+            remaining_minor -= slice_minor
+            previous_upto = tier.upto_minor if tier.upto_minor is not None else previous_upto
+
+        if remaining_minor <= 0:
+            break
+
+    # Add the fixed component.
+    total_minor = variable_fee.minor + sched.fixed_minor
+    return Money(total_minor, amount.currency)
 
 
 def effective_rate(amount: Money, schedule: FeeSchedule | str = STANDARD) -> Decimal:
