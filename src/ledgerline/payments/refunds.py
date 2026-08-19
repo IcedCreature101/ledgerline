@@ -43,6 +43,16 @@ def allocate(amount: Money, lines: list[OrderLine]) -> list[Money]:
         proportion = Decimal(line.amount.minor) / Decimal(order_total)
         share = (Decimal(amount.minor) * proportion).quantize(Decimal(1), rounding=ROUND_HALF_UP)
         shares.append(Money(int(share), amount.currency))
+
+    # Ensure the rounded shares sum exactly to the requested amount.
+    allocated_total = sum(s.minor for s in shares)
+    diff = amount.minor - allocated_total
+    if diff != 0:
+        # Adjust the last share by the difference (diff is typically ±1 cent).
+        last = shares[-1]
+        adjusted = Money(last.minor + diff, last.currency)
+        shares[-1] = adjusted
+
     return shares
 
 
@@ -53,7 +63,8 @@ def refund(amount: Money, lines: list[OrderLine], *, already_refunded: Money | N
     if (paid + amount).minor > order_total.minor:
         raise RefundError(
             f"refunding {amount} would exceed the order total {order_total} "
-            f"(already refunded {paid})")
+            f"(already refunded {paid})"
+        )
     shares = allocate(amount, lines)
     return {
         "requested": amount,
