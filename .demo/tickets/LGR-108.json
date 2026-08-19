@@ -1,0 +1,9 @@
+{
+  "id": "LGR-108",
+  "difficulty": "L3",
+  "category": "Database/data handling",
+  "area": "db",
+  "gold": ".demo/gold/test_export_pagination.py",
+  "title": "The settlement export is silently dropping most of a merchant's transactions",
+  "details": "Northwind reconciled our settlement export against their own records and found it short.\n\nTheir account has 8 settled transactions for the period. The export produced 3 of them. No error, no\nwarning \u2014 the file is just short, and it has been short for at least six weeks.\n\nWe reproduced it on a test merchant: with 30 transactions where every third one is settled, the export\nreturns the first few and then stops. The rows it does return are correct and in the right order; it is\nthe ones after a certain point that never appear.\n\nMerchants whose transactions are ALL settled get a complete export, which is why our own reconciliation\nchecks never caught it \u2014 the test merchants we use are all fully settled.\n\nThe export appears to give up early rather than paging to the end of the data."
+}

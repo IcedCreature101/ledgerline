@@ -1,0 +1,9 @@
+{
+  "id": "LGR-103",
+  "difficulty": "L1",
+  "category": "Validation",
+  "area": "validation",
+  "gold": ".demo/gold/test_iban_unsupported_country.py",
+  "title": "Payout to a Maltese account was accepted at onboarding and bounced days later",
+  "details": "A merchant added a payout account with the IBAN MT84 MALT 0110 0001 2345 MTLC AST0 01S\nand our onboarding form accepted it. The payout ran four days later and was returned by the\ncorrespondent bank; the merchant went unpaid for a week and is now asking for compensation.\n\nMalta is not a corridor we are licensed to pay out to. Neither are Brazil (BR) or T\u00fcrkiye (TR), and we\nhave found accepted accounts for both of those in the payout table as well.\n\nThe IBAN itself is genuine \u2014 it is a real, correctly-formed Maltese account number, so the checksum is\nfine. The problem is that we should not have taken it in the first place. Onboarding is supposed to\nrefuse any country we do not process, and it is letting them through instead.\n\nUK and German accounts are unaffected; those are validated properly, including the length check and the\ntransposed-digit case."
+}

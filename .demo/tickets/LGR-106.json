@@ -1,0 +1,9 @@
+{
+  "id": "LGR-106",
+  "difficulty": "L1",
+  "category": "Date/time and reporting",
+  "area": "reporting",
+  "gold": ".demo/gold/test_period_month_end.py",
+  "title": "February statements cover 30 days and spill into March",
+  "details": "Finance caught this while closing the February books.\n\nThe February 2024 merchant statement is labelled 2024-02-01..2024-03-02. It includes the 1st and 2nd of\nMarch, and those same two days appear again on the March statement, so every affected merchant has two\ndays of transactions counted twice across the two documents.\n\nApril is wrong in the same way (2024-04-01..2024-05-01) and so is June, September and November. January,\nMarch, May, July, August, October and December all look correct.\n\nThe pattern is that any month that does not have 31 days is wrong, and it is wrong by exactly the\ndifference. A statement period should start on the first of the month and end on the last day of THAT\nmonth, whatever the month's length and whether or not it is a leap year."
+}

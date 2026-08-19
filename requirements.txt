@@ -1,0 +1,3 @@
+# Ledgerline runs on the standard library alone. The only development dependency is the test runner,
+# which keeps a clean checkout installable anywhere without a wheel build.
+pytest>=7.0

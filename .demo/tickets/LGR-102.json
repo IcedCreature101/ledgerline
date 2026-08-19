@@ -1,0 +1,9 @@
+{
+  "id": "LGR-102",
+  "difficulty": "L2",
+  "category": "Financial/business logic (rounding)",
+  "area": "refunds",
+  "gold": ".demo/gold/test_refund_allocation.py",
+  "title": "Split refunds return one cent less than the customer was promised",
+  "details": "Support raised this after three separate customer complaints in a week.\n\nA customer on order #55120 was refunded USD 10.00. The order had three lines of USD 5.00 each. The\nrefund confirmation email said 10.00, the customer's card was credited 9.99, and our per-line report\nshows 3.33 + 3.33 + 3.33.\n\nIt is one cent, but it is one cent that does not reconcile: the refund total and the sum of the line\nallocations disagree, so the daily settlement file does not balance and finance has been correcting it by\nhand every morning.\n\nIt seems to happen whenever the refund does not divide evenly across the lines. Refunds that split\ncleanly (10.00 across two 5.00 lines) are fine. The missing amount can also go the other way \u2014 we have one\ncase where the allocations summed to MORE than the refund.\n\nWhatever the split is, the per-line allocations have to add up to exactly the amount refunded."
+}

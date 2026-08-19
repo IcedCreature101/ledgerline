@@ -1,0 +1,9 @@
+{
+  "id": "LGR-104",
+  "difficulty": "L2",
+  "category": "API/backend behaviour",
+  "area": "api",
+  "gold": ".demo/gold/test_idempotency_key_order.py",
+  "title": "Retrying a payment with the same Idempotency-Key returns 409 and the payment is stuck",
+  "details": "Reported by the integration team at Harbour Point.\n\nTheir client posts to /v1/payments with an Idempotency-Key. When the first request times out on their\nside they retry with the same key and the same payment, which is exactly what our documentation tells\nthem to do. They are getting back:\n\n    409 {\"error\": {\"code\": \"idempotency_conflict\",\n                   \"message\": \"idempotency key 'key-1' was already used for a different request\"}}\n\nIt is not a different request. It is the same merchant, the same amount, the same currency. Their retry\nis built by re-serialising the payment object, so the JSON fields can come out in a different order from\nthe first attempt, but every value is identical.\n\nThe effect is that a payment they cannot confirm is one they can also never complete \u2014 the key is burned\nand they have to mint a new one and hope they are not charging the customer twice.\n\nA retry that is byte-identical works. A retry with the same content in a different field order does not."
+}

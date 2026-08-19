@@ -1,0 +1,9 @@
+{
+  "id": "LGR-107",
+  "difficulty": "L2",
+  "category": "Error handling",
+  "area": "fx",
+  "gold": ".demo/gold/test_fx_missing_rate.py",
+  "title": "A USD payment settled to a Swedish merchant at a 1:1 rate",
+  "details": "Treasury escalated this one and it is the most expensive thing on this list.\n\nA merchant settling in SEK was paid out for USD 100.00 and received SEK 100.00. The mid-market rate that\nday was around 10.4, so they were underpaid by roughly a factor of ten. Three merchants are affected and\nthe total exposure is a little over USD 40,000.\n\nThe treasury feed had not published a USD/SEK rate that morning \u2014 the corridor was added last week and\nthe feed configuration had not been updated. That is our operational mistake and we have fixed the feed.\n\nWhat we cannot live with is what the system did about it. With no rate available, the conversion returned\nthe same number in the target currency and the payout went out as if nothing were wrong. There is no\nerror in the logs, no alert, and nothing on the settlement report to show the amount was never actually\nconverted.\n\nA conversion we cannot price has to fail loudly so the payout is held. Silently substituting a rate \u2014 any\nrate \u2014 is not an acceptable outcome. Corridors that DO have a published rate must keep working exactly as\nthey do now, including the inverse of a quoted pair."
+}

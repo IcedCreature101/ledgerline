@@ -1,0 +1,9 @@
+{
+  "id": "LGR-105",
+  "difficulty": "L3",
+  "category": "Transaction/payment logic",
+  "area": "payments",
+  "gold": ".demo/gold/test_capture_over_authorization.py",
+  "title": "A merchant captured 160.00 against a 100.00 authorization",
+  "details": "Risk flagged this during the weekly chargeback review.\n\nAuthorization auth_004182 held USD 100.00. The merchant captured 80.00 on Tuesday, shipped the rest of\nthe order on Thursday, and captured 80.00 again \u2014 and we accepted it. The card network did not, and the\n80.00 second capture came back as a chargeback with a fee attached.\n\nLooking through the last month there are eleven authorizations where the sum of the captures is more\nthan the amount that was held. In every one of them each individual capture was smaller than the\nauthorization; it is the total that is over.\n\nA single capture larger than the hold IS refused correctly \u2014 we tested that. It is only when a merchant\ncaptures in parts that the total is allowed to run past the amount authorised.\n\nThe hold is the ceiling for everything captured against it, not for each capture separately."
+}

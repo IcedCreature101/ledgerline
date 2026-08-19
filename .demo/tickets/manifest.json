@@ -1,0 +1,71 @@
+{
+  "repo": "jeet-1236/ledgerline",
+  "baseline_branch": "main",
+  "baseline_tag": "demo-baseline",
+  "tickets": [
+    {
+      "id": "LGR-101",
+      "difficulty": "L2",
+      "category": "Financial/business logic",
+      "area": "fees",
+      "gold": ".demo/gold/test_fees_tiered.py",
+      "title": "Large payouts are being overcharged on the tiered fee schedule"
+    },
+    {
+      "id": "LGR-102",
+      "difficulty": "L2",
+      "category": "Financial/business logic (rounding)",
+      "area": "refunds",
+      "gold": ".demo/gold/test_refund_allocation.py",
+      "title": "Split refunds return one cent less than the customer was promised"
+    },
+    {
+      "id": "LGR-103",
+      "difficulty": "L1",
+      "category": "Validation",
+      "area": "validation",
+      "gold": ".demo/gold/test_iban_unsupported_country.py",
+      "title": "Payout to a Maltese account was accepted at onboarding and bounced days later"
+    },
+    {
+      "id": "LGR-104",
+      "difficulty": "L2",
+      "category": "API/backend behaviour",
+      "area": "api",
+      "gold": ".demo/gold/test_idempotency_key_order.py",
+      "title": "Retrying a payment with the same Idempotency-Key returns 409 and the payment is stuck"
+    },
+    {
+      "id": "LGR-105",
+      "difficulty": "L3",
+      "category": "Transaction/payment logic",
+      "area": "payments",
+      "gold": ".demo/gold/test_capture_over_authorization.py",
+      "title": "A merchant captured 160.00 against a 100.00 authorization"
+    },
+    {
+      "id": "LGR-106",
+      "difficulty": "L1",
+      "category": "Date/time and reporting",
+      "area": "reporting",
+      "gold": ".demo/gold/test_period_month_end.py",
+      "title": "February statements cover 30 days and spill into March"
+    },
+    {
+      "id": "LGR-107",
+      "difficulty": "L2",
+      "category": "Error handling",
+      "area": "fx",
+      "gold": ".demo/gold/test_fx_missing_rate.py",
+      "title": "A USD payment settled to a Swedish merchant at a 1:1 rate"
+    },
+    {
+      "id": "LGR-108",
+      "difficulty": "L3",
+      "category": "Database/data handling",
+      "area": "db",
+      "gold": ".demo/gold/test_export_pagination.py",
+      "title": "The settlement export is silently dropping most of a merchant's transactions"
+    }
+  ]
+}
