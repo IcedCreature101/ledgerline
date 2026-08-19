@@ -69,10 +69,11 @@ class TransactionRepository:
         Used by the settlement export, which pages until it receives fewer rows than it asked for.
         """
         rows = self.conn.execute(
-            "SELECT * FROM transactions WHERE merchant_id = ? "
+            "SELECT * FROM transactions "
+            "WHERE merchant_id = ? AND status = 'settled' "
             "ORDER BY created_at ASC, id ASC LIMIT ? OFFSET ?",
             (merchant_id, limit, offset)).fetchall()
-        return [Transaction.from_row(r) for r in rows if r["status"] == "settled"]
+        return [Transaction.from_row(r) for r in rows]
 
     def export_settled(self, merchant_id: str, *, page_size: int = 50) -> list[Transaction]:
         """Every settled transaction for a merchant, walked one page at a time."""
