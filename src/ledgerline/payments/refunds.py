@@ -38,12 +38,40 @@ def allocate(amount: Money, lines: list[OrderLine]) -> list[Money]:
     if amount.is_negative():
         raise RefundError("cannot allocate a negative refund")
 
-    shares: list[Money] = []
+    # First pass: compute each line's raw share and its rounded cent value.
+    raw_shares: list[Decimal] = []
+    rounded_shares: list[int] = []
     for line in lines:
         proportion = Decimal(line.amount.minor) / Decimal(order_total)
-        share = (Decimal(amount.minor) * proportion).quantize(Decimal(1), rounding=ROUND_HALF_UP)
-        shares.append(Money(int(share), amount.currency))
-    return shares
+        raw = Decimal(amount.minor) * proportion
+        raw_shares.append(raw)
+        rounded = int(raw.quantize(Decimal(1), rounding=ROUND_HALF_UP))
+        rounded_shares.append(rounded)
+
+    # Compute the difference between the requested amount and the sum of rounded shares.
+    total_rounded = sum(rounded_shares)
+    diff = amount.minor - total_rounded  # positive => need to add cents, negative => need to remove
+
+    if diff != 0:
+        # Remainders indicate how far each raw share was from its rounded value.
+        # remainder = raw - rounded (can be positive or negative)
+        remainders = [(i, raw_shares[i] - Decimal(rounded_shares[i])) for i in range(len(lines))]
+
+        if diff > 0:
+            # Need to add cents to the lines with the largest positive remainders
+            remainders.sort(key=lambda x: x[1], reverse=True)
+            for i in range(diff):
+                idx = remainders[i][0]
+                rounded_shares[idx] += 1
+        else:
+            # Need to subtract cents from the lines with the most negative remainders
+            remainders.sort(key=lambda x: x[1])  # ascending: most negative first
+            for i in range(-diff):
+                idx = remainders[i][0]
+                rounded_shares[idx] -= 1
+
+    # Convert the final cent amounts back to Money objects.
+    return [Money(share, amount.currency) for share in rounded_shares]
 
 
 def refund(amount: Money, lines: list[OrderLine], *, already_refunded: Money | None = None) -> dict:
@@ -53,7 +81,8 @@ def refund(amount: Money, lines: list[OrderLine], *, already_refunded: Money | N
     if (paid + amount).minor > order_total.minor:
         raise RefundError(
             f"refunding {amount} would exceed the order total {order_total} "
-            f"(already refunded {paid})")
+            f"(already refunded {paid})"
+        )
     shares = allocate(amount, lines)
     return {
         "requested": amount,
