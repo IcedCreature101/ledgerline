@@ -1,0 +1,25 @@
+{
+  "name": "Ledgerline",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11-bookworm",
+
+  // WHY THIS FILE EXISTS
+  //
+  // Without it GitHub boots its universal image: several gigabytes of every toolchain it can think of,
+  // and a minute or more of "Setting up your codespace" before anything appears. Ledgerline needs Python
+  // and pytest. A reviewer opening an agent's branch should be looking at the diff, not at a spinner.
+  //
+  // The postCreate also fetches the default branch, which a codespace does not clone. Without it
+  // `git diff master` — the first thing anyone types when reviewing a branch — fails with
+  // "ambiguous argument 'master': unknown revision".
+  "postCreateCommand": "pip install --user -r requirements.txt && git fetch origin master:master 2>/dev/null || true",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"],
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": ["tests"]
+      }
+    }
+  }
+}
