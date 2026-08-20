@@ -33,7 +33,8 @@ def capture(auth: Authorization, amount: Money, *, now: datetime | None = None) 
     if amount.is_zero() or amount.is_negative():
         raise AuthorizationError("a capture must be for a positive amount")
 
-    if amount.minor > auth.amount.minor:
+    # Ensure cumulative captures do not exceed the authorized amount.
+    if amount > auth.remaining():
         raise OverCapture(
             f"cannot capture {amount} against {auth.auth_id}: authorized for {auth.amount}")
 
