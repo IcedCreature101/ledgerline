@@ -38,12 +38,29 @@ def allocate(amount: Money, lines: list[OrderLine]) -> list[Money]:
     if amount.is_negative():
         raise RefundError("cannot allocate a negative refund")
 
-    shares: list[Money] = []
+    # Initial proportional allocation with rounding
+    raw_shares: list[Money] = []
     for line in lines:
         proportion = Decimal(line.amount.minor) / Decimal(order_total)
         share = (Decimal(amount.minor) * proportion).quantize(Decimal(1), rounding=ROUND_HALF_UP)
-        shares.append(Money(int(share), amount.currency))
-    return shares
+        raw_shares.append(Money(int(share), amount.currency))
+
+    # Adjust for any rounding discrepancy so that the sum matches the requested amount
+    allocated_total = sum(s.minor for s in raw_shares)
+    diff = amount.minor - allocated_total  # positive => need to add cents, negative => need to remove
+
+    if diff != 0:
+        # Distribute the missing/extra cents to the first |diff| lines
+        sign = 1 if diff > 0 else -1
+        adjusted_shares: list[Money] = []
+        for i, share in enumerate(raw_shares):
+            if i < abs(diff):
+                adjusted_shares.append(Money(share.minor + sign, share.currency))
+            else:
+                adjusted_shares.append(share)
+        return adjusted_shares
+
+    return raw_shares
 
 
 def refund(amount: Money, lines: list[OrderLine], *, already_refunded: Money | None = None) -> dict:
