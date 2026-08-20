@@ -11,6 +11,16 @@
   // The postCreate also fetches the default branch, which a codespace does not clone. Without it
   // `git diff master` — the first thing anyone types when reviewing a branch — fails with
   // "ambiguous argument 'master': unknown revision".
+  // sshd, because the base image does not ship one and GitHub's universal image does.
+  //
+  // Without it `gh codespace ssh` fails with "sshd is not installed" — and that is not a convenience:
+  // it is the channel AgentForge uses to RUN anything inside a codespace, because the Codespaces REST
+  // API has no exec endpoint. Adding a devcontainer to make the editor start faster silently disabled
+  // the feature the codespace exists to demonstrate.
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": { "version": "latest" }
+  },
+
   "postCreateCommand": "pip install --user -r requirements.txt && git fetch origin master:master 2>/dev/null || true",
 
   "customizations": {
