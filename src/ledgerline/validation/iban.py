@@ -60,6 +60,8 @@ def validate_iban(iban: str) -> bool:
         return False
     if len(s) < 5 or not _SHAPE.match(s):
         return False
+    if is_supported_country(s) is False:
+        return False
     expected = _LENGTHS.get(s[:2])
     if expected is not None and len(s) != expected:
         return False
