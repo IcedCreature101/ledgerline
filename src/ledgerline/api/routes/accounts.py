@@ -4,7 +4,12 @@ from __future__ import annotations
 import itertools
 
 from ledgerline.api.router import Request, Router
-from ledgerline.validation.iban import format_iban, normalize, validate_iban
+from ledgerline.validation.iban import (
+    format_iban,
+    normalize,
+    validate_iban,
+    is_supported_country,
+)
 
 router = Router()
 _account_seq = itertools.count(1)
@@ -25,6 +30,10 @@ def add_payout_account(request: Request):
     """
     iban = request.body.get("iban", "")
     if not validate_iban(iban):
+        return 422, {"error": {"code": "invalid_iban",
+                               "message": "that IBAN is not one we can pay out to"}}
+    # Reject IBANs from countries we do not support for payouts.
+    if not is_supported_country(iban):
         return 422, {"error": {"code": "invalid_iban",
                                "message": "that IBAN is not one we can pay out to"}}
     account_id = f"acct_{next(_account_seq):06d}"
