@@ -37,7 +37,7 @@ class RateTable:
             inverse = self.rates.get((quote, base))
             if inverse is not None and inverse != 0:
                 return Decimal("1") / inverse
-            return Decimal("1")
+            raise RateUnavailable(f"no rate published for {base}/{quote}") from None
 
     def has(self, base: str, quote: str) -> bool:
         base, quote = base.upper(), quote.upper()
