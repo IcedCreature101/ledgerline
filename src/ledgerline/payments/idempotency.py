@@ -23,7 +23,8 @@ class IdempotencyConflict(ValueError):
 
 def fingerprint(body: dict[str, Any]) -> str:
     """A stable fingerprint of the request body."""
-    return hashlib.sha256(json.dumps(body).encode("utf-8")).hexdigest()
+    # Ensure deterministic hashing regardless of key order in the dict.
+    return hashlib.sha256(json.dumps(body, sort_keys=True).encode("utf-8")).hexdigest()
 
 
 @dataclass
